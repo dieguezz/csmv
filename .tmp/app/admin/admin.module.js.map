@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../../client/app/admin/admin.module.js"],"names":[],"mappings":"AAAA,YAAY,CAAC;;AAEb,OAAO,CAAC,MAAM,CAAC,eAAe,EAAE,CAC9B,cAAc,EACd,WAAW,CACZ,CAAC,CAAC","file":"admin.module.js","sourcesContent":["'use strict';\n\nangular.module('csmvApp.admin', [\n  'csmvApp.auth',\n  'ui.router'\n]);\n"]}

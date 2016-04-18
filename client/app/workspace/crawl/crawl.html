@@ -1,17 +1,37 @@
 <div class="container-fluid">
+  <h1 class="hidden">Crawl website</h1>
   <div class="row">
     <div ncy-breadcrumb></div>
     <div class="col-xs-12" ui-view>
       <label for="site-selector">Select an existing domain</label>
       <div class="form-group">
-        <select class="form-control" id="site-selector">
-          <option>1</option>
-        </select>
+        <select ng-model="crawl.sitemap" ng-options="sitemap.domain for sitemap in crawl.sitemaps" class="form-control" id="site-selector"><select>
       </div>
       <div class="form-group">
         <p>Or create a new one:</p>
         <a class="btn btn-default" ui-sref="workspace.crawl.new">New Domain</a>
       </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid crawler-results">
+  <div class="row">
+    <div class="results__header col-xs-12">
+      <h3>Results</h3>
+    </div>
+    <ul class="results__list">
+      <li ng-repeat="url in crawl.sitemap.urls" class="row results__list__item">
+        <div class="col-xs-11">
+          <span>{{url}}</span>
+        </div>
+        <div class="col-xs-1">
+          <button class="btn btn-danger btn-xs" ng-click="crawl.removeUrl(url)"><i class="fa fa-trash"></i></button>
+        </div>
+      </li>
+    </ul>
+    <div ng-show="crawl.isLoading" class="loader">
+      <i class="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom"></i>
+      <span class="sr-only">Loading...</span>
     </div>
   </div>
 </div>

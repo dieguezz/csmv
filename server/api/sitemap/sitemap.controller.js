@@ -12,7 +12,28 @@
 var _ = require('lodash');
 var Sitemap = require('./sitemap.model');
 var Crawler = require('simplecrawler');
-
+// var influx = require('influx');
+// var serverInflux = influx();
+// serverInflux.getDatabaseNames(function(err, dbs) {
+//   if (err) {
+//     res.status(422).send(err);
+//   }
+//   if (dbs.indexOf(req.body.domain) === -1) {
+//     serverInflux.createDatabase(req.body.domain, function(err, result) {
+//       if (err) {
+//         res.status(422).send(err);
+//       }
+//     });
+//   } else {
+//     var influxDb = influx({
+//       // or single-host configuration
+//       host: 'localhost',
+//       port: 8086, // optional, default 8086
+//       username: 'dieguin',
+//       password: 'Amparo123$',
+//       database: req.body.domain
+//     });
+//   }
 
 
 
@@ -67,10 +88,17 @@ function removeEntity(res) {
 
 // Gets a list of Things
 exports.index = function(req, res) {
-  console.log('let me see...')
-  console.log('eq', req.body)
+  Sitemap.findAsync({})
+    .then(function(domains) {
+      res.status(200).json(domains);
+    })
+    .catch(handleError(res));
+};
+
+exports.crawl = function(req, res) {
+
   var urls = [];
-  var crawler = new Crawler(req.body.url);
+  var crawler = new Crawler(req.body.domain);
   crawler.initialPath = req.body.initialPath || '/';
   crawler.interval = req.body.interval || 250;
   crawler.maxConcurrency = req.body.maxConcurrency || 5;
@@ -87,10 +115,6 @@ exports.index = function(req, res) {
   crawler.parseScriptTags = req.body.parseScriptTags || false;
   crawler.maxDepth = req.body.maxDepth || 0;
   crawler.ignoreInvalidSSL = req.body.ignoreInvalidSSL || true;
-  //
-  // crawler.addFetchCondition(function(parsedURL, queueItem) {
-  //   return !parsedURL.path.match(/\.jpg$/i);
-  // });
 
   crawler.queue.max("requestLatency", function(max) {
     console.log("The maximum request latency was %dms.", max);
@@ -102,16 +126,53 @@ exports.index = function(req, res) {
     console.log("The average resource size received is %d bytes.", avg);
   });
 
+  if (req.body.fetchConditions) {
+    addFetchConditions(req.body.fetchConditions);
+  }
+
   addCrawlEvents();
   crawler.start();
+
+  function addFetchConditions(conditions) {
+    conditions.map(function(condition) {
+      crawler.addFetchCondition(function(parsedURL, queueItem) {
+        var regExp = new RegExp("." + condition + "$", "i");
+        return !parsedURL.path.match(regExp);
+      });
+    });
+  }
 
   function addCrawlEvents() {
     crawler.on('crawlstart', function() {
       console.log('crawlstart', arguments);
+      Sitemap.findOneAsync({
+        domain: req.body.domain
+      }).then(function(response) {
+        if (response) {
+          response.removeAsync().then(function() {
+            Sitemap.createAsync({
+              domain: req.body.domain,
+              urls: []
+            }).then(function() {});
+          });
+        } else {
+          Sitemap.createAsync({
+            domain: req.body.domain,
+            urls: []
+          }).then(function() {});
+        }
+      }).catch(handleError(res));
     });
     crawler.on('queueadd', function(queueItem) {
       console.log('queueadd', queueItem.url);
       urls.push(queueItem.url);
+      Sitemap.findOneAndUpdateAsync({
+        domain: req.body.domain
+      }, {
+        $push: {
+          urls: queueItem.url
+        }
+      });
     });
     // crawler.on('queueduplicate', function(URLData) {
     //   console.log('queueduplicate', arguments);
@@ -182,13 +243,16 @@ exports.index = function(req, res) {
     // });
     crawler.on('complete', function() {
       console.log('complete', urls);
+      res.status(200).send(urls)
     });
   }
 };
 
 // Gets a single Thing from the DB
 exports.show = function(req, res) {
-  Sitemap.findByIdAsync(req.params.id)
+  Sitemap.findOneAsync({
+      domain: req.params.domain
+    })
     .then(handleEntityNotFound(res))
     .then(responseWithResult(res))
     .catch(handleError(res));
@@ -215,8 +279,15 @@ exports.update = function(req, res) {
 
 // Deletes a Thing from the DB
 exports.destroy = function(req, res) {
-  Sitemap.findByIdAsync(req.params.id)
-    .then(handleEntityNotFound(res))
-    .then(removeEntity(res))
+  Sitemap.findOneAndUpdateAsync({
+      domain: req.body.domain
+    }, {
+      $pull: {
+        urls: req.body.url
+      }
+    })
+    .then(function() {
+      res.sendStatus(200);
+    })
     .catch(handleError(res));
 };

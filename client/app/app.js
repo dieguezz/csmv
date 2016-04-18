@@ -8,12 +8,20 @@ angular.module('csmvApp', [
     'ngCookies',
     'ngResource',
     'ngSanitize',
+    'ngTagsInput',
     'btford.socket-io',
     'ui.router',
     'ui.bootstrap',
     'validation.match',
   ])
-  .config(function($urlRouterProvider, $locationProvider) {
+  .config(function($urlRouterProvider, $locationProvider, tagsInputConfigProvider) {
+    tagsInputConfigProvider
+      .setDefaults('tagsInput', {
+        placeholder: 'jpg, png, etc...',
+        minLength: 2,
+        addOnEnter: false
+      })
+
     $urlRouterProvider
       .otherwise('/');
 

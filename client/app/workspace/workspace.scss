@@ -44,4 +44,6 @@ workspacenavbar {
 #page-content-wrapper {
   width: calc(100% - 250px);
   float: right;
+  height: calc(100vh - 51px);
+  overflow: auto;
 }

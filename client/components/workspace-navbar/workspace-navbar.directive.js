@@ -9,8 +9,6 @@ angular.module('csmvApp')
       scope: {
         navOptions: '='
       },
-      link: function(scope, element) {
-        console.log(scope, element);
-      }
+      link: function(scope, element) {}
     };
   });

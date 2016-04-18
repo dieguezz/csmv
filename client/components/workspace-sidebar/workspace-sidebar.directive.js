@@ -6,8 +6,6 @@ angular.module('csmvApp')
       templateUrl: 'components/workspace-sidebar/workspace-sidebar.html',
       restrict: 'E',
       transclude: true,
-      link: function(scope, element) {
-        console.log(scope, element);
-      }
+      link: function(scope, element) {}
     };
   });

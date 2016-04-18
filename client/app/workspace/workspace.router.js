@@ -41,7 +41,7 @@ angular.module('csmvApp')
         url: '/new',
         templateUrl: 'app/workspace/crawl/new/new.html',
         controller: 'WorkspaceCrawlNewController',
-        controllerAs: 'crawl',
+        controllerAs: 'newCrawl',
         authenticate: true,
         ncyBreadcrumb: {
           label: 'Crawl New Domain'

@@ -14,6 +14,7 @@ SitemapEvents.setMaxListeners(0);
 // Model events
 var events = {
   'save': 'save',
+  'update': 'update',
   'remove': 'remove'
 };
 
@@ -21,6 +22,7 @@ var events = {
 for (var e in events) {
   var event = events[e];
   Sitemap.schema.post(e, emitEvent(event));
+  Sitemap.schema.update(e, emitEvent(event));
 }
 
 function emitEvent(event) {

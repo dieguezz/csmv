@@ -1,16 +1,116 @@
-<form>
-  <legend>New Crawl</legend>
-  <fieldset class="form-group">
-    <label for="protocol">Protocol</label>
-    <select class="form-control" id="protocol">
-      <option>http</option>
-      <option>https</option>
-    </select>
-  </fieldset>
-  <fieldset class="form-group">
-    <label for="url">Domain</label>
-    <input type="text" class="form-control" id="url" placeholder="example.com">
-    <small class="text-muted">We'll never share your email with anyone else.</small>
-  </fieldset>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+<div class="container-fluid">
+  <form name="form" class="form-horizontal" role="form" novalidate>
+    <h2 class="hidden">New Crawl</h2>
+    <fieldset class="form-group">
+      <legend>New Crawl</legend>
+      <label for="url">Domain</label>
+      <input type="text" ng-model="crawler.form.domain" class="form-control" id="url" placeholder="example.com">
+      <small class="text-muted clearfix">Using advanced options is strongly recommended for faster crawling.</small>
+    </fieldset>
+    <fieldset class="form-group">
+      <button class="btn btn-default" ng-click="crawler.advancedOptions = !crawler.advancedOptions">Advanced options</button>
+      <button ng-show="!crawler.advancedOptions" type="submit" ng-click="crawler.crawlDomain(crawler.form)" class="btn btn-primary">Submit</button>
+    </fieldset>
+
+    <fieldset class="form-group crawler__advanced-options" ng-show="crawler.advancedOptions">
+      <legend>Advanced Options</legend>
+      <div class="row">
+        <div class="form--control col-xs-3">
+          <label for="initialpath">Initial path</label>
+          <input ng-model="crawler.form.initialPath" class="form-control" title="Initial path defaults to '/'" id="initialpath" type="text" placeholder="/whatever">
+        </div>
+        <div class="form--control col-xs-3">
+          <label for="interval">Interval</label>
+          <input ng-model="crawler.form.interval" type="number" id="interval" title="Interval to spool new requests. Defaults to 250" class="form-control" placeholder="250">
+        </div>
+        <div class="form--control col-xs-3">
+          <label for="maxconcurrency">Max concurrency</label>
+          <input ng-model="crawler.form.maxConcurrency" type="number" id="maxconcurrency" title="Defaults to 5" class="form-control" placeholder="5">
+        </div>
+        <div class="form--control col-xs-3">
+          <label for="timeout">Timeout</label>
+          <input ng-model="crawler.form.timeout" type="number" id="timeout" title="The maximum time in milliseconds the crawler will wait for headers before aborting the request. Defaults to 30000" class="form-control" placeholder="30000">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form--control col-xs-12">
+          <label for="useragent">User Agent</label>
+          <input type="text" ng-model="crawler.form.userAgent" id="useragent" class="form-control" placeholder="Node/simplecrawler <version> (https://github.com/cgiffard/node-simplecrawler)">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form--control col-xs-6">
+          <label for="useragent">Exclude files</label>
+          <tags-input ng-model="crawler.form.fetchConditions"></tags-input>
+        </div>
+        <div class="form--control col-xs-3">
+          <label for="maxsize">Max resource size</label>
+          <input type="number" ng-model="crawler.form.maxSize" id="maxsize" title="The maximum resource size that will be downloaded, in bytes. Defaults to 16MB" class="form-control" placeholder="16777216">
+        </div>
+        <div class="form--control col-xs-3">
+          <label for="maxdepth">Max depth</label>
+          <input type="number" ng-model="crawler.form.maxDepth" id="maxdepth" title="Defines a maximum distance from the original request at which resources will be downloaded. Defaults to 0 (no max depth)" class="form-control" placeholder="0">
+        </div>
+      </div>
+      <div class="row">
+        <div class="checkbox">
+          <div class="col-xs-12">
+            <label class="col-xs-4" for="respectRobotsTxt" class="checkbox">
+              <input type="checkbox" ng-model="crawler.form.respectRobotsTxt" id="respectRobotsTxt" value="respectRobotsTxt"> Respect robots.txt
+            </label>
+            <label class="col-xs-4" for="allowInitalDomainChange" class="checkbox">
+              <input ng-model="crawler.form.allowInitialDomainChange" type="checkbox" id="allowInitalDomainChange" value="allowInitalDomainChange"> Allow initial domain change
+            </label>
+            <label class="col-xs-4" for="filterByDomain" class="checkbox">
+              <input ng-model="crawler.form.filterByDomain" type="checkbox" id="filterByDomain" value="filterByDomain"> Filter by domain
+            </label>
+            <label class="col-xs-4" for="scanSubDomains" class="checkbox">
+              <input ng-model="crawler.form.scanSubDomains" type="checkbox" id="scanSubDomains" value="scanSubDomains"> Scan sub domains
+            </label>
+            <label class="col-xs-4" for="ignoreWWW" class="checkbox">
+              <input ng-model="crawler.form.ignoreWWW" type="checkbox" id="ignoreWWW" value="ignoreWWW"> Ignore WWW
+            </label>
+            <label class="col-xs-4" for="stripWWW" class="checkbox">
+              <input ng-model="crawler.form.stripWWW" type="checkbox" id="stripWWW" value="stripWWW"> Stip WWW
+            </label>
+            <label class="col-xs-4" for="parseHTMLComments" class="checkbox">
+              <input ng-model="crawler.form.parseHTMLComments" type="checkbox" id="parseHTMLComments" value="parseHTMLComments"> Parse HTML comments
+            </label>
+            <label class="col-xs-4" for="parseScriptTags" class="checkbox">
+              <input ng-model="crawler.form.parseScriptTags" type="checkbox" id="parseScriptTags" value="parseScriptTags"> Parse Script Tags
+            </label>
+            <label class="col-xs-4" for="ignoreInvalidSSL" class="checkbox">
+              <input ng-model="crawler.form.ignoreValidSSL" type="checkbox" id="ignoreInvalidSSL" value="ignoreInvalidSSL"> Ignore invalid SSL certificate
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form--control">
+        <button type="submit" ng-click="crawler.crawlDomain(crawler.form)" class="btn btn-primary">Submit</button>
+      </div>
+    </fieldset>
+  </form>
+</div>
+<div class="container-fluid crawler-results">
+  <div class="row">
+
+    <div class="results__header">
+      <h3>Results</h3>
+    </div>
+    <ul class="results__list">
+      <li ng-repeat="url in crawler.sitemap" class="row results__list__item">
+        <div class="col-xs-11">
+          <span>{{url}}</span>
+        </div>
+        <div class="col-xs-1">
+          <button class="btn btn-danger btn-xs" ng-click="crawler.removeUrl(url)"><i class="fa fa-trash"></i></button>
+        </div>
+      </li>
+    </ul>
+    <div ng-show="crawler.results.isLoading" class="loader">
+      <i class="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom"></i>
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+</div>
