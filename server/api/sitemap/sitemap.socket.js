@@ -13,17 +13,16 @@ exports.register = function(socket) {
   // Bind model events to socket events
   for (var i = 0, eventsLength = events.length; i < eventsLength; i++) {
     var event = events[i];
-    var listener = createListener('thing:' + event, socket);
+    var listener = createListener('sitemap:' + event, socket);
 
     SitemapEvents.on(event, listener);
     socket.on('disconnect', removeListener(event, listener));
   }
 };
 
-
 function createListener(event, socket) {
   return function(doc) {
-    socket.emit(event, doc);
+    socket.emit(event, doc.urls);
   };
 }
 

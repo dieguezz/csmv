@@ -33,9 +33,13 @@
         </div>
       </div>
       <div class="row">
-        <div class="form--control col-xs-12">
+        <div class="form--control col-xs-8">
           <label for="useragent">User Agent</label>
           <input type="text" ng-model="crawler.form.userAgent" id="useragent" class="form-control" placeholder="Node/simplecrawler <version> (https://github.com/cgiffard/node-simplecrawler)">
+        </div>
+        <div class="form--control col-xs-4">
+          <label for="addCondition">Path to fetch</label>
+          <input type="text" ng-model="crawler.form.addCondition" id="addCondition" class="form-control" placeholder="category">
         </div>
       </div>
 
@@ -89,7 +93,7 @@
       <div class="form--control">
         <button type="submit" ng-click="crawler.crawlDomain(crawler.form)" class="btn btn-primary">Submit</button>
       </div>
-    </fieldset>
+    </fieldset[0]
   </form>
 </div>
 <div class="container-fluid crawler-results">
@@ -99,7 +103,7 @@
       <h3>Results</h3>
     </div>
     <ul class="results__list">
-      <li ng-repeat="url in crawler.sitemap" class="row results__list__item">
+      <li ng-repeat="url in crawler.sitemap[0] track by $index" class="row results__list__item">
         <div class="col-xs-11">
           <span>{{url}}</span>
         </div>
@@ -108,6 +112,9 @@
         </div>
       </li>
     </ul>
+    <div ng-show="crawler.results.empty" class="results__empty">
+      <p>Nothing found</p>
+    </div>
     <div ng-show="crawler.results.isLoading" class="loader">
       <i class="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom"></i>
       <span class="sr-only">Loading...</span>

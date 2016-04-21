@@ -130,13 +130,25 @@ exports.crawl = function(req, res) {
     addFetchConditions(req.body.fetchConditions);
   }
 
+  if (req.body.addCondition) {
+    addConditions(req.body.addCondition);
+  }
+
   addCrawlEvents();
   crawler.start();
 
+  function addConditions(condition) {
+    crawler.addFetchCondition(function(parsedURL) {
+      var regExp = new RegExp(condition, 'g');
+      console.log(regExp);
+      return parsedURL.path.match(regExp);
+    });
+  }
+
   function addFetchConditions(conditions) {
     conditions.map(function(condition) {
-      crawler.addFetchCondition(function(parsedURL, queueItem) {
-        var regExp = new RegExp("." + condition + "$", "i");
+      crawler.addFetchCondition(function(parsedURL) {
+        var regExp = new RegExp('.' + condition + '$', 'i');
         return !parsedURL.path.match(regExp);
       });
     });
@@ -166,12 +178,11 @@ exports.crawl = function(req, res) {
     crawler.on('queueadd', function(queueItem) {
       console.log('queueadd', queueItem.url);
       urls.push(queueItem.url);
-      Sitemap.findOneAndUpdateAsync({
+      Sitemap.findOneAsync({
         domain: req.body.domain
-      }, {
-        $push: {
-          urls: queueItem.url
-        }
+      }).then(function(site) {
+        site.urls.push(queueItem.url);
+        site.saveAsync();
       });
     });
     // crawler.on('queueduplicate', function(URLData) {

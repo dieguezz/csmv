@@ -8,7 +8,8 @@
       this.$http = $http;
       this.awesomeThings = [];
 
-      $http.get('/api/things').then(response => {
+      $http.get('/api/sitemaps').then(response => {
+        console.log(response)
         this.awesomeThings = response.data;
         socket.syncUpdates('thing', this.awesomeThings);
       });

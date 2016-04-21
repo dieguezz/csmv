@@ -7,8 +7,7 @@
 import config from './environment';
 
 // When the user disconnects.. perform this
-function onDisconnect(socket) {
-}
+function onDisconnect(socket) {}
 
 // When the user connects.. perform this
 function onConnect(socket) {
@@ -18,7 +17,7 @@ function onConnect(socket) {
   });
 
   // Insert sockets below
-  require('../api/thing/thing.socket').register(socket);
+  require('../api/sitemap/sitemap.socket').register(socket);
 
 }
 

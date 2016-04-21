@@ -22,10 +22,10 @@ var events = {
 for (var e in events) {
   var event = events[e];
   Sitemap.schema.post(e, emitEvent(event));
-  Sitemap.schema.update(e, emitEvent(event));
 }
 
 function emitEvent(event) {
+  console.log('EMIT EVENT')
   return function(doc) {
     SitemapEvents.emit(event + ':' + doc._id, doc);
     SitemapEvents.emit(event, doc);

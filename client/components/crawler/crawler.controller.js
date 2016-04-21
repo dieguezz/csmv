@@ -35,15 +35,20 @@ class CrawlerController {
     if (form.fetchConditions) {
       form.fetchConditions = self.tagsToArr();
     }
+    self.socket.syncUpdates('sitemap', self.sitemap);
     this.$http.post('api/sitemaps', form).then(function(response) {
-      self.sitemap = response.data;
+      self.results(response.data.length);
+      self.sitemap[0] = response.data;
       self.results.isLoading = false;
-      // self.socket.syncUpdates('sitemap', self.sitemap);
     }, function(err) {
       self.results.isLoading = false;
       throw err;
     });
   }
+
+  results.prototype.isEmpty = function(length) {
+    return length > 0;
+  };
 
   removeUrl(url) {
     var self = this;
